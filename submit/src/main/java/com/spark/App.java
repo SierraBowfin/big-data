@@ -49,6 +49,15 @@ public class App
 
         spark.sql("set spark.sql.legacy.timeParserPolicy=LEGACY");
 
+
+        System.out.println("cityWithMaxAccidentsInPeiod");
+        cityWithMaxAccidentsInPeiod(dataset, 
+            start_time, end_time);
+
+        System.out.println("cityAccidentsPOI accidents");
+        cityAccidentsPOI(dataset, 
+            start_time, end_time);
+
         System.out.println("stopVsGiveWay");
         stopVsGiveWay(dataset, city, 
             start_time, end_time);
@@ -59,14 +68,6 @@ public class App
 
         System.out.println("distanceAndDurationStatsForState");
         distanceAndDurationStatsForState(dataset, state, 
-            start_time, end_time);
-            
-        System.out.println("cityWithMaxAccidentsInPeiod");
-        cityWithMaxAccidentsInPeiod(dataset, 
-            start_time, end_time);
-
-        System.out.println("cityAccidentsPOI accidents");
-        cityAccidentsPOI(dataset, 
             start_time, end_time);
 
         System.out.println("Weather conditions during accidents");
@@ -134,10 +135,10 @@ public class App
             
         filt.sort(filt.col("count(City)").desc()).show();
 
-        Dataset<Row> diff = filt.select(filt.col("Traffic_Signal"), filt.col("Roundabout"))
-            .withColumn("Difference", filt.col("Roundabout").minus(filt.col("Traffic_Signal")));
+        Dataset<Row> diff = filt.select(filt.col("Traffic_Signal"), filt.col("Junction"))
+            .withColumn("Difference", filt.col("Junction").minus(filt.col("Traffic_Signal")));
 
-        diff.select(functions.sum(diff.col("Difference")).as("Total Difference")).show();
+        diff.select(functions.sum(diff.col("Difference")).as("J_vs_TS")).show();
     }
 
 
@@ -223,7 +224,6 @@ public class App
             .groupBy(ds.col("State"), ds.col("City"))
             .agg(functions.count(ds.col("City")));
             
-        filt.sort(filt.col("count(City)")).show(10);
         filt.sort(filt.col("count(City)").desc()).show(10);
     }
 
@@ -235,12 +235,13 @@ public class App
         Dataset<Row> ds1 = ds.select(
             ds.col("Bump"),
             ds.col("Crossing"),
-            ds.col("Give_Way"),
             ds.col("Junction"),
+            ds.col("Traffic_Signal"),
             ds.col("Start_Time"),
             ds.col("End_Time"),
             ds.col("Amenity"),
             ds.col("Roundabout"),
+            ds.col("Give_Way"),
             ds.col("Stop"),
             ds.col("City"));
             
@@ -251,9 +252,10 @@ public class App
                 functions.count(ds1.col("City")),
                 functions.sum(functions.when(ds1.col("Bump").equalTo(false), 0).when(ds1.col("Bump").equalTo(true), 1)).as("Bump"),
                 functions.sum(functions.when(ds1.col("Crossing").equalTo(false), 0).when(ds1.col("Crossing").equalTo(true), 1)).as("Crossing"),
-                functions.sum(functions.when(ds1.col("Give_Way").equalTo(false), 0).when(ds1.col("Give_Way").equalTo(true), 1)).as("Give_Way"),
                 functions.sum(functions.when(ds1.col("Junction").equalTo(false), 0).when(ds1.col("Junction").equalTo(true), 1)).as("Junction"),
                 functions.sum(functions.when(ds1.col("Roundabout").equalTo(false), 0).when(ds1.col("Roundabout").equalTo(true), 1)).as("Roundabout"),
+                functions.sum(functions.when(ds1.col("Traffic_Signal").equalTo(false), 0).when(ds1.col("Traffic_Signal").equalTo(true), 1)).as("Traffic_Signal"),
+                functions.sum(functions.when(ds1.col("Give_Way").equalTo(false), 0).when(ds1.col("Give_Way").equalTo(true), 1)).as("Give_Way"),
                 functions.sum(functions.when(ds1.col("Stop").equalTo(false), 0).when(ds1.col("Stop").equalTo(true), 1)).as("Stop")
                 );
             
