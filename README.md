@@ -50,8 +50,7 @@ Project 2 consists of 2 applications: **stream-producer** and **stream-consumer*
 
 Project 3 also consists of 2 applications: batch-model-training and stream-classification  
 
-**batch-model-training** is app for training ML model for predicting severity of accident (classification) depending on accident location, weather condition during accident, distance of accident.   
-Two models were tested: *logistic regression model* and *random forest model* - with random forest achieving more accuracy (around 70%). Models are saved on HDFS along with additional objects that preprocess data before feeding it the model
+**batch-model-training** batch-model-training is app for training ML model for predicting severity of accident (classification) depending on accident location, weather condition during accident, distance of accident and description. Two models were tested - nlp logistic regression model based on description and random forest model. Models are saved on HDFS along with pipeline objects that preprocess data before feeding it the model
 
 **stream-classification** is application that loads model and preprocessing objects from HDFS and feeds published data from **accidents** Kafka stream to the model and displays the results.
 
