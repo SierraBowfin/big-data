@@ -107,7 +107,6 @@ public class App {
             return;
         }
 
-        final PipelineModel indexerPipeline = loadPipeline(hdfsUrl, indexersHdfsPath);
         final PipelineModel descriptionPipeline = loadPipeline(hdfsUrl, pipelineHdfsPath);
 
 
@@ -147,7 +146,6 @@ public class App {
                 Dataset<Row> predictions = descriptionModel.transform(transformed);
 
                 System.out.println("showing results");
-                predictions.printSchema();
                 predictions.select(predictions.col("Severity"), predictions.col("prediction")).show();
 
             } catch (Exception e){
@@ -165,13 +163,12 @@ public class App {
                 System.out.println("DATA PRINTING ___________________________");
                 StructType st = RowSchema.getRowSchema();
                 Dataset<Row> ds = spark.createDataFrame(rowRdd, st);
-                ds.show();
 
-                //System.out.println("Loading pipes");
-                //Pipeline indexerPipeline = new Pipeline().setStages(indexers);
+                System.out.println("Loading pipes");
+                Pipeline indexerPipeline = new Pipeline().setStages(indexers);
                 System.out.println("Applying pipes to dataset");
-                //Dataset<Row> transformed = indexerPipeline.fit(ds).transform(ds);
-                Dataset<Row> transformed = indexerPipeline.transform(ds);
+                Dataset<Row> transformed = indexerPipeline.fit(ds).transform(ds);
+
 
                 String[] columns = transformed.columns();
                 String[] featureCols = removeColumns(columns, columnsToRemove);
