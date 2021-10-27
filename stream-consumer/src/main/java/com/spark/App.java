@@ -91,7 +91,7 @@ public class App {
         JavaInputDStream<ConsumerRecord<Object, String>> stream = KafkaUtils.createDirectStream(streamingContext,
                 LocationStrategies.PreferConsistent(), ConsumerStrategies.Subscribe(topics, kafkaParams));
 
-        String city = "Los Angeles";
+        String city = "Cincinnati";
 
         JavaDStream<String> receivedData = stream.map(ConsumerRecord::value);
         receivedData.print();
